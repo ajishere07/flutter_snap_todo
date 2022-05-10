@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snap_todo/widgets/List_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,15 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SnapTodo',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('SnapTodo'),
-          backgroundColor: Colors.black,
-        ),
-        body: const Center(
-          child: Text('hello'),
-        ),
-      ),
+      home: ListGrid(),
     );
   }
 }
