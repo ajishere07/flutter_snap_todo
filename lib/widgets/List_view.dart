@@ -9,6 +9,38 @@ class ListGrid extends StatefulWidget {
 
 class _ListGridState extends State<ListGrid> {
   List<String> superheroes = ['task 1', 'task 2', 'task 3'];
+  late TextEditingController textEditingController;
+ Future<Null> exitDialog() async {
+    showDialog(
+        context: context,
+        builder: (context) => new AlertDialog(
+              title: Text('ToDo List'),
+              content: TextField(
+              cursorColor: Colors.black,
+              // style: TextStyle(
+              //   color: Colors.white
+              // ),
+              
+              decoration: InputDecoration(
+                filled:true,
+                hintText: 'Enter todo item',
+                // fillColor: Colors.blueAccent,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                  borderRadius: BorderRadius.circular(15),
+                  
+                ),
+              ),
+            ),
+              actions: [FlatButton(onPressed: null, child: Text('Add'))],
+            ));
+  }
+
+  @override
+  void initState() {
+    textEditingController = TextEditingController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +60,10 @@ class _ListGridState extends State<ListGrid> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
         child: Icon(Icons.add),
         backgroundColor: Colors.black,
+        hoverColor: Colors.blue,
+        onPressed:exitDialog,
       ),
     );
   }
