@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 
 class ListGrid extends StatefulWidget {
   const ListGrid({Key? key}) : super(key: key);
@@ -8,39 +10,52 @@ class ListGrid extends StatefulWidget {
 }
 
 class _ListGridState extends State<ListGrid> {
-  List<String> superheroes = ['task 1', 'task 2', 'task 3'];
-  late TextEditingController textEditingController;
- Future<Null> exitDialog() async {
-    showDialog(
-        context: context,
-        builder: (context) => new AlertDialog(
-              title: Text('ToDo List'),
-              content: TextField(
-              cursorColor: Colors.black,
-              // style: TextStyle(
-              //   color: Colors.white
-              // ),
-              
-              decoration: InputDecoration(
-                filled:true,
-                hintText: 'Enter todo item',
-                // fillColor: Colors.blueAccent,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue),
-                  borderRadius: BorderRadius.circular(15),
-                  
-                ),
-              ),
-            ),
-              actions: [FlatButton(onPressed: null, child: Text('Add'))],
-            ));
+  // List<String> superheroes = ['task 1', 'task 2', 'task 3'];
+  // late TextEditingController textEditingController =
+  //     new TextEditingController();
+  late TextEditingController controller;
+  ToastContext toast = ToastContext();
+  List<String> todos = [];
+  String name = '';
+  bool isChecked = false;
+  bool isEmpty = false;
+  @override
+  void initState() {
+    super.initState();
+    ToastContext().init(context);
+    controller = TextEditingController();
   }
 
   @override
-  void initState() {
-    textEditingController = TextEditingController();
-    super.initState();
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
+
+  Future<String?> openDialog() => showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: Text('Your Name'),
+            content: TextField(
+                onChanged: (inputValue) {
+                  if (inputValue.isEmpty) {
+                    setValidator(true);
+                  } else {
+                    setValidator(false);
+                  }
+                },
+                autofocus: true,
+                // Add some other day
+
+                // decoration: InputDecoration(
+                //     hintText: 'Enter Name',
+                //     errorText: isEmpty ? "Enter a todo" : null,
+                //     errorStyle: TextStyle(color: Colors.red)),
+
+                // Add some other day
+                controller: controller),
+            actions: [TextButton(onPressed: submit, child: Text('SUBMIT'))],
+          ));
 
   @override
   Widget build(BuildContext context) {
@@ -50,21 +65,66 @@ class _ListGridState extends State<ListGrid> {
         backgroundColor: Colors.black,
       ),
       body: Container(
-        child: ListView.builder(
-          itemCount: superheroes.length,
-          itemBuilder: ((context, index) => Card(
-                child: ListTile(
-                  title: Text(superheroes[index]),
-                ),
-              )),
-        ),
-      ),
+          child: ListView.builder(
+        itemCount: todos.length,
+        itemBuilder: ((context, index) => Card(
+              child: ListTile(
+                  title: Text(todos[index]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete_forever_rounded),
+                    onPressed: () {
+                      setState(() {
+                        todos.removeAt(index);
+                      });
+                    },
+                  )),
+            )),
+
+        //       Center(
+        // child: Text(
+        //   name,
+        //   style: TextStyle(color: Colors.red),
+        // ),
+      )),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        backgroundColor: Colors.black,
-        hoverColor: Colors.blue,
-        onPressed:exitDialog,
-      ),
+          child: Icon(Icons.add),
+          backgroundColor: Colors.black,
+          hoverColor: Colors.blue,
+          onPressed: () async {
+            final name = await openDialog();
+            if (name == null || name.isEmpty) return;
+
+            setState(() => this.name = name);
+            todos.add(name);
+            log(todos.last);
+          }
+          // () {
+          //   createAlertDialog(context).then((onValue) {
+          //     this.name = onValue;
+          //     log(onValue);
+          //   });
+          // },
+          ),
     );
+  }
+
+  void submit() {
+    if (isEmpty) {
+      showToast("It can not be empty");
+      return;
+    }
+    Navigator.of(context).pop(controller.text);
+    // getvalue = textEditingController.text;
+  }
+
+  void showToast(String msg, {int? duration, int? gravity}) {
+    Toast.show(msg,
+        duration: duration, gravity: gravity, backgroundColor: Colors.red);
+  }
+
+  void setValidator(bool status) {
+    setState(() {
+      isEmpty = status;
+    });
   }
 }
