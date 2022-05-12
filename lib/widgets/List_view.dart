@@ -9,15 +9,25 @@ class ListGrid extends StatefulWidget {
   _ListGridState createState() => _ListGridState();
 }
 
+class Todo {
+  String content = "";
+  bool isChecked = false;
+
+  Todo(String content, bool isChecked) {
+    this.content = content;
+    this.isChecked = isChecked;
+  }
+}
+
 class _ListGridState extends State<ListGrid> {
   // List<String> superheroes = ['task 1', 'task 2', 'task 3'];
   // late TextEditingController textEditingController =
   //     new TextEditingController();
   late TextEditingController controller;
   ToastContext toast = ToastContext();
-  List<String> todos = [];
+  List<Todo> todos = [];
   String name = '';
-  bool isChecked = false;
+
   bool isEmpty = false;
   @override
   void initState() {
@@ -69,15 +79,26 @@ class _ListGridState extends State<ListGrid> {
         itemCount: todos.length,
         itemBuilder: ((context, index) => Card(
               child: ListTile(
-                  title: Text(todos[index]),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete_forever_rounded),
-                    onPressed: () {
-                      setState(() {
-                        todos.removeAt(index);
-                      });
-                    },
-                  )),
+                tileColor: todos[index].isChecked ? Colors.green : null,
+                title: Text(todos[index].content),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete_forever_rounded),
+                  onPressed: () {
+                    setState(() {
+                      todos.removeAt(index);
+                    });
+                  },
+                ),
+                leading: Checkbox(
+                  activeColor: Colors.green,
+                  value: todos[index].isChecked,
+                  onChanged: (val) {
+                    setState(() {
+                      todos[index].isChecked = val!;
+                    });
+                  },
+                ),
+              ),
             )),
 
         //       Center(
@@ -95,8 +116,9 @@ class _ListGridState extends State<ListGrid> {
             if (name == null || name.isEmpty) return;
 
             setState(() => this.name = name);
-            todos.add(name);
-            log(todos.last);
+            Todo todo = new Todo(name, false);
+            todos.add(todo);
+            log(todos[todos.length - 1].content);
           }
           // () {
           //   createAlertDialog(context).then((onValue) {
