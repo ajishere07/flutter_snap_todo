@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ListGrid extends StatefulWidget {
   const ListGrid({Key? key}) : super(key: key);
@@ -27,12 +28,32 @@ class _ListGridState extends State<ListGrid> {
   ToastContext toast = ToastContext();
   List<Todo> todos = [];
   String name = '';
+  // List<Todo> ids = [];
+  int a = 0;
+  //firebase firestore initiliaze
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
   bool isEmpty = false;
   @override
   void initState() {
     super.initState();
     ToastContext().init(context);
+
+    // int adf = fetchFromFirestore().then((value) => log("${ids.length}"));
+    fetchFromFirestore();
+    // db.collection("todosCollection/1/userTodo").get().then((event) {
+    //   for (var doc in event.docs) {
+    //     Todo todo = new Todo(doc.id, false);
+    //     setState(() {
+    //       ids.add(todo);
+    //     });
+
+    //     log("${doc.id} => ${doc.data()}");
+    //     print("${doc.id} => ${doc.data()}");
+    //   }
+    // }) as List<Todo>;
+
+    log("$a");
     controller = TextEditingController();
   }
 
@@ -76,11 +97,13 @@ class _ListGridState extends State<ListGrid> {
       ),
       body: Container(
           child: ListView.builder(
-        itemCount: todos.length,
+        itemCount: a,
         itemBuilder: ((context, index) => Card(
               child: ListTile(
+                // changed todos=> ids
                 tileColor: todos[index].isChecked ? Colors.green : null,
                 title: Text(todos[index].content),
+                // title: Text(ids[index].content),
                 trailing: IconButton(
                   icon: Icon(Icons.delete_forever_rounded),
                   onPressed: () {
@@ -91,9 +114,11 @@ class _ListGridState extends State<ListGrid> {
                 ),
                 leading: Checkbox(
                   activeColor: Colors.green,
+                  //changed todos => ids
                   value: todos[index].isChecked,
                   onChanged: (val) {
                     setState(() {
+                      // changed
                       todos[index].isChecked = val!;
                     });
                   },
@@ -118,6 +143,16 @@ class _ListGridState extends State<ListGrid> {
             setState(() => this.name = name);
             Todo todo = new Todo(name, false);
             todos.add(todo);
+            final todoData = <String, dynamic>{
+              "content": todo.content,
+              "isChecked": todo.isChecked,
+            };
+            //firebase firestore add data
+            await db
+                .collection("todosCollection")
+                .doc("1")
+                .collection("userTodo")
+                .add(todoData);
             log(todos[todos.length - 1].content);
           }
           // () {
@@ -147,6 +182,30 @@ class _ListGridState extends State<ListGrid> {
   void setValidator(bool status) {
     setState(() {
       isEmpty = status;
+    });
+  }
+
+  Future<void> fetchFromFirestore() async {
+    setState(() {
+      db.collection("todosCollection/1/userTodo").get().then((event) {
+        for (var doc in event.docs) {
+          Todo todo = new Todo(doc.get("content"), false);
+          setState(() {
+            todos.add(todo);
+          });
+
+          log("${doc.id} => ${doc.data()}");
+          print("${doc.id} => ${doc.data()}");
+          int b = todos.length;
+          setList(b);
+        }
+      });
+    });
+  }
+
+  void setList(int b) {
+    setState(() {
+      this.a = b;
     });
   }
 }
