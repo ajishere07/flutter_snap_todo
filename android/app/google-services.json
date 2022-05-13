@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "223326884779",
+    "project_id": "flutter-snap-todo",
+    "storage_bucket": "flutter-snap-todo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223326884779:android:5cffd3c11d66e88ecd38ee",
+        "android_client_info": {
+          "package_name": "com.app.snap_todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223326884779-4dhcetvocqob89q01m2344fpgumhkbv8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhdTM7D5EbZRmXq5qNL235nuTvwrF3rlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223326884779-4dhcetvocqob89q01m2344fpgumhkbv8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "223326884779-90i5ls5265006ov4f4g5uj8ejhfif5dg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.snapTodo"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223326884779:android:8405b5672588e292cd38ee",
+        "android_client_info": {
+          "package_name": "com.example.snap_todo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223326884779-4dhcetvocqob89q01m2344fpgumhkbv8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhdTM7D5EbZRmXq5qNL235nuTvwrF3rlc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223326884779-4dhcetvocqob89q01m2344fpgumhkbv8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "223326884779-90i5ls5265006ov4f4g5uj8ejhfif5dg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.snapTodo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
