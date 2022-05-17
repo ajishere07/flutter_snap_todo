@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 
 class ListGrid extends StatefulWidget {
   const ListGrid({Key? key}) : super(key: key);
@@ -13,10 +14,11 @@ class ListGrid extends StatefulWidget {
 class Todo {
   String content = "";
   bool isChecked = false;
-
-  Todo(String content, bool isChecked) {
+  String id = "";
+  Todo(String content, bool isChecked, String id) {
     this.content = content;
     this.isChecked = isChecked;
+    this.id = id;
   }
 }
 
@@ -28,8 +30,7 @@ class _ListGridState extends State<ListGrid> {
   ToastContext toast = ToastContext();
   List<Todo> todos = [];
   String name = '';
-  // List<Todo> ids = [];
-  int a = 0;
+
   //firebase firestore initiliaze
   FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -39,21 +40,12 @@ class _ListGridState extends State<ListGrid> {
     super.initState();
     ToastContext().init(context);
 
-    // int adf = fetchFromFirestore().then((value) => log("${ids.length}"));
-    fetchFromFirestore();
-    // db.collection("todosCollection/1/userTodo").get().then((event) {
-    //   for (var doc in event.docs) {
-    //     Todo todo = new Todo(doc.id, false);
-    //     setState(() {
-    //       ids.add(todo);
-    //     });
+    fetchFromFirestore().then((value) {
+      setState(() {
+        todos = value;
+      });
+    });
 
-    //     log("${doc.id} => ${doc.data()}");
-    //     print("${doc.id} => ${doc.data()}");
-    //   }
-    // }) as List<Todo>;
-
-    log("$a");
     controller = TextEditingController();
   }
 
@@ -97,7 +89,7 @@ class _ListGridState extends State<ListGrid> {
       ),
       body: Container(
           child: ListView.builder(
-        itemCount: a,
+        itemCount: todos.length,
         itemBuilder: ((context, index) => Card(
               child: ListTile(
                 // changed todos=> ids
@@ -141,27 +133,33 @@ class _ListGridState extends State<ListGrid> {
             if (name == null || name.isEmpty) return;
 
             setState(() => this.name = name);
-            Todo todo = new Todo(name, false);
+            const uuid = Uuid();
+            String id = uuid.v1();
+            print(uuid.runtimeType);
+            Todo todo = new Todo(name, false, id);
             todos.add(todo);
             final todoData = <String, dynamic>{
               "content": todo.content,
               "isChecked": todo.isChecked,
+              "id": todo.id
             };
             //firebase firestore add data
+
             await db
                 .collection("todosCollection")
                 .doc("1")
                 .collection("userTodo")
-                .add(todoData);
-            log(todos[todos.length - 1].content);
-          }
-          // () {
-          //   createAlertDialog(context).then((onValue) {
-          //     this.name = onValue;
-          //     log(onValue);
-          //   });
-          // },
-          ),
+                .doc(todo.id)
+                .set(todoData);
+
+            log("${todos.length}");
+
+            fetchFromFirestore().then((value) {
+              setState(() {
+                todos = value;
+              });
+            });
+          }),
     );
   }
 
@@ -185,27 +183,16 @@ class _ListGridState extends State<ListGrid> {
     });
   }
 
-  Future<void> fetchFromFirestore() async {
-    setState(() {
-      db.collection("todosCollection/1/userTodo").get().then((event) {
-        for (var doc in event.docs) {
-          Todo todo = new Todo(doc.get("content"), false);
-          setState(() {
-            todos.add(todo);
-          });
-
-          log("${doc.id} => ${doc.data()}");
-          print("${doc.id} => ${doc.data()}");
-          int b = todos.length;
-          setList(b);
-        }
-      });
+  Future<List<Todo>> fetchFromFirestore() async {
+    List<Todo> todoss = [];
+    db.collection("todosCollection/1/userTodo").get().then((event) {
+      for (var doc in event.docs) {
+        Todo todo = new Todo(doc.get("content"), doc.get("isChecked"), doc.id);
+        setState(() {
+          todoss.add(todo);
+        });
+      }
     });
-  }
-
-  void setList(int b) {
-    setState(() {
-      this.a = b;
-    });
+    return todoss;
   }
 }
