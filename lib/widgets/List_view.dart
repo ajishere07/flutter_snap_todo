@@ -98,9 +98,18 @@ class _ListGridState extends State<ListGrid> {
                 // title: Text(ids[index].content),
                 trailing: IconButton(
                   icon: Icon(Icons.delete_forever_rounded),
-                  onPressed: () {
-                    setState(() {
-                      todos.removeAt(index);
+                  onPressed: () async {
+                    await db
+                        .collection("todosCollection")
+                        .doc("1")
+                        .collection("userTodo")
+                        .doc(todos[index].id)
+                        .delete();
+
+                    fetchFromFirestore().then((value) {
+                      setState(() {
+                        todos = value;
+                      });
                     });
                   },
                 ),
