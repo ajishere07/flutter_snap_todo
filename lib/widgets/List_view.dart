@@ -87,56 +87,80 @@ class _ListGridState extends State<ListGrid> {
         title: const Text('SnapTodo'),
         backgroundColor: Colors.black,
       ),
-      body: Container(
-          child: ListView.builder(
-        itemCount: todos.length,
-        itemBuilder: ((context, index) => Card(
-              child: ListTile(
-                // changed todos=> ids
-                tileColor: todos[index].isChecked ? Colors.green : null,
-                title: Text(todos[index].content),
-                // title: Text(ids[index].content),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete_forever_rounded),
-                  onPressed: () async {
-                    await db
-                        .collection("todosCollection")
-                        .doc("1")
-                        .collection("userTodo")
-                        .doc(todos[index].id)
-                        .delete();
+      body: todos.length != 0
+          ? Container(
+              child: ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: ((context, index) => Card(
+                    child: ListTile(
+                      // changed todos=> ids
+                      tileColor: todos[index].isChecked ? Colors.green : null,
+                      title: Text(todos[index].content),
+                      // title: Text(ids[index].content),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete_forever_rounded),
+                        onPressed: () async {
+                          await db
+                              .collection("todosCollection")
+                              .doc("1")
+                              .collection("userTodo")
+                              .doc(todos[index].id)
+                              .delete();
 
-                    fetchFromFirestore().then((value) {
-                      setState(() {
-                        todos = value;
-                      });
-                    });
-                  },
-                ),
-                leading: Checkbox(
-                  activeColor: Colors.green,
-                  //changed todos => ids
-                  value: todos[index].isChecked,
-                  onChanged: (val) async {
-                    bool value = val!;
-                    log("${value}");
-                    await db
-                        .collection("todosCollection")
-                        .doc("1")
-                        .collection("userTodo")
-                        .doc(todos[index].id)
-                        .update({"isChecked": value});
+                          fetchFromFirestore().then((value) {
+                            setState(() {
+                              todos = value;
+                            });
+                          });
+                        },
+                      ),
+                      leading: Checkbox(
+                        activeColor: Colors.green,
+                        //changed todos => ids
+                        value: todos[index].isChecked,
+                        onChanged: (val) async {
+                          bool value = val!;
 
-                    fetchFromFirestore().then((value) {
-                      setState(() {
-                        todos = value;
-                      });
-                    });
-                  },
-                ),
-              ),
-            )),
-      )),
+                          await db
+                              .collection("todosCollection")
+                              .doc("1")
+                              .collection("userTodo")
+                              .doc(todos[index].id)
+                              .update({"isChecked": value});
+
+                          fetchFromFirestore().then((value) {
+                            setState(() {
+                              todos = value;
+                            });
+                          });
+                        },
+                      ),
+                    ),
+                  )),
+            ))
+          : Center(
+              child: Wrap(children: [
+                Container(
+                  // decoration: BoxDecoration(
+                  //     border: Border.all(color: Colors.blueAccent)),
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/no_todos.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                      Text(
+                        "No todos",
+                        style:
+                            TextStyle(color: Color(0xffCCCCCC), fontSize: 20),
+                      )
+                    ],
+                  ),
+                )
+              ]),
+            ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           backgroundColor: Colors.black,
@@ -148,7 +172,7 @@ class _ListGridState extends State<ListGrid> {
             setState(() => this.name = name);
             const uuid = Uuid();
             String id = uuid.v1();
-            print(uuid.runtimeType);
+
             Todo todo = new Todo(name, false, id);
             todos.add(todo);
             final todoData = <String, dynamic>{
@@ -165,7 +189,7 @@ class _ListGridState extends State<ListGrid> {
                 .doc(todo.id)
                 .set(todoData);
 
-            log("${todos.length}");
+            print("${todos.length}");
 
             fetchFromFirestore().then((value) {
               setState(() {
