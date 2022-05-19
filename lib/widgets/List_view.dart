@@ -117,21 +117,25 @@ class _ListGridState extends State<ListGrid> {
                   activeColor: Colors.green,
                   //changed todos => ids
                   value: todos[index].isChecked,
-                  onChanged: (val) {
-                    setState(() {
-                      // changed
-                      todos[index].isChecked = val!;
+                  onChanged: (val) async {
+                    bool value = val!;
+                    log("${value}");
+                    await db
+                        .collection("todosCollection")
+                        .doc("1")
+                        .collection("userTodo")
+                        .doc(todos[index].id)
+                        .update({"isChecked": value});
+
+                    fetchFromFirestore().then((value) {
+                      setState(() {
+                        todos = value;
+                      });
                     });
                   },
                 ),
               ),
             )),
-
-        //       Center(
-        // child: Text(
-        //   name,
-        //   style: TextStyle(color: Colors.red),
-        // ),
       )),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
